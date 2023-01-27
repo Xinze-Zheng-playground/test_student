@@ -1,0 +1,96 @@
+name: mp2 autograding
+'on':
+  workflow_dispatch: {}
+jobs:
+  valgrind:
+    name: valgrind
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Checkout release repository
+      id: sr-checkout
+      uses: actions/checkout@v2
+    - name: Checkout release repository
+      id: release-checkout
+      uses: actions/checkout@v2
+      with:
+        repository: cs340-illinois/fa22_cs340_.release
+        ref: mp2
+        path: release
+    - name: Copy local files from release
+      id: local-copy
+      uses: illinois/local-copy@v1
+      with:
+        src_path: release/mp2
+        dst_path: mp2
+        copy: '.github/classroom : .github/classroom, Makefile : Makefile, tests : tests, sample : sample'
+    - name: Verify student submission
+      id: verify-policy
+      uses: illinois/verify-policy@v1
+      with:
+        reference_files: 'release/mp2/.github/classroom : mp2/.github/classroom, release/mp2/Makefile : mp2/Makefile, release/mp2/tests : mp2/tests, release/mp2/sample : mp2/sample'
+    - name: Install valgrind
+      run: sudo apt install -y valgrind
+    - name: Autograding
+      id: autograding
+      uses: wadefagen/autograding@v2
+      with:
+        path: mp2/
+        test_suite: valgrind
+        step_summary: true
+    - name: Generate workflow summary
+      if: ${{ always() }}
+      run: echo -e "$(sh ./.github/workflows/gen-status-report.sh)" >> $GITHUB_STEP_SUMMARY
+      env:
+        sr_checkout_status: ${{ steps.sr-checkout.outcome }}
+        release_checkout_status: ${{ steps.release-checkout.outcome }}
+        local_copy_status: ${{ steps.local-copy.outcome }}
+        verify_policy_status: ${{ steps.verify-policy.outcome }}
+        autograding_status: ${{ steps.autograding.outcome }}
+        points: ${{ steps.autograding.outputs.Points }}
+    needs:
+    - autograding
+  autograding:
+    name: autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Checkout release repository
+      id: sr-checkout
+      uses: actions/checkout@v2
+    - name: Checkout release repository
+      id: release-checkout
+      uses: actions/checkout@v2
+      with:
+        repository: cs340-illinois/fa22_cs340_.release
+        ref: mp2
+        path: release
+    - name: Copy local files from release
+      id: local-copy
+      uses: illinois/local-copy@v1
+      with:
+        src_path: release/mp2
+        dst_path: mp2
+        copy: '.github/classroom : .github/classroom, Makefile : Makefile, tests : tests, sample : sample'
+    - name: Verify student submission
+      id: verify-policy
+      uses: illinois/verify-policy@v1
+      with:
+        reference_files: 'release/mp2/.github/classroom : mp2/.github/classroom, release/mp2/Makefile : mp2/Makefile, release/mp2/tests : mp2/tests, release/mp2/sample : mp2/sample'
+    - name: Autograding
+      id: autograding
+      uses: wadefagen/autograding@v2
+      with:
+        path: mp2/
+        test_suite: autograding
+        step_summary: true
+    - name: Generate workflow summary
+      if: ${{ always() }}
+      run: echo -e "$(sh ./.github/workflows/gen-status-report.sh)" >> $GITHUB_STEP_SUMMARY
+      env:
+        sr_checkout_status: ${{ steps.sr-checkout.outcome }}
+        release_checkout_status: ${{ steps.release-checkout.outcome }}
+        local_copy_status: ${{ steps.local-copy.outcome }}
+        verify_policy_status: ${{ steps.verify-policy.outcome }}
+        autograding_status: ${{ steps.autograding.outcome }}
+        points: ${{ steps.autograding.outputs.Points }}

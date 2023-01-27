@@ -1,0 +1,53 @@
+name: mp8 autograding
+'on':
+  workflow_dispatch: {}
+jobs:
+  autograding:
+    name: autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Checkout release repository
+      id: sr-checkout
+      uses: actions/checkout@v2
+    - name: Checkout release repository
+      id: release-checkout
+      uses: actions/checkout@v2
+      with:
+        repository: cs340-illinois/fa22_cs340_.release
+        ref: mp8
+        path: release
+    - name: Copy local files from release
+      id: local-copy
+      uses: illinois/local-copy@v1
+      with:
+        src_path: release/mp8
+        dst_path: mp8
+        copy: '.github/classroom : .github/classroom, mandelbrot_microservice : mandelbrot_microservice, test_microservice.py : test_microservice.py, requirements.txt : requirements.txt'
+    - name: Verify student submission
+      id: verify-policy
+      uses: illinois/verify-policy@v1
+      with:
+        reference_files: 'release/mp8/.github/classroom : mp8/.github/classroom, release/mp8/mandelbrot_microservice : mp8/mandelbrot_microservice, release/mp8/test_microservice.py : mp8/test_microservice.py'
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - run: pip install -r mp8/requirements.txt
+    - name: Autograding
+      id: autograding
+      uses: wadefagen/autograding@v2
+      with:
+        path: mp8/
+        test_suite: autograding
+        step_summary: true
+    - name: Generate workflow summary
+      if: ${{ always() }}
+      run: echo -e "$(sh ./.github/workflows/gen-status-report.sh)" >> $GITHUB_STEP_SUMMARY
+      env:
+        sr_checkout_status: ${{ steps.sr-checkout.outcome }}
+        release_checkout_status: ${{ steps.release-checkout.outcome }}
+        local_copy_status: ${{ steps.local-copy.outcome }}
+        verify_policy_status: ${{ steps.verify-policy.outcome }}
+        autograding_status: ${{ steps.autograding.outcome }}
+        points: ${{ steps.autograding.outputs.Points }}

@@ -1,0 +1,91 @@
+name: mp6 autograding
+'on':
+  workflow_dispatch: {}
+jobs:
+  autograding:
+    name: autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Checkout release repository
+      id: sr-checkout
+      uses: actions/checkout@v2
+    - name: Checkout release repository
+      id: release-checkout
+      uses: actions/checkout@v2
+      with:
+        repository: cs340-illinois/fa22_cs340_.release
+        ref: mp6
+        path: release
+    - name: Copy local files from release
+      id: local-copy
+      uses: illinois/local-copy@v1
+      with:
+        src_path: release/mp6
+        dst_path: mp6
+        copy: '.github/classroom : .github/classroom, Makefile : Makefile, test_docker.py : test_docker.py, test_flask.py : test_flask.py'
+    - name: Verify student submission
+      id: verify-policy
+      uses: illinois/verify-policy@v1
+      with:
+        reference_files: 'release/mp6/.github/classroom : mp6/.github/classroom, release/mp6/Makefile : mp6/Makefile, release/mp6/test_docker.py : mp6/test_docker.py, release/mp6/test_flask.py : mp6/test_flask.py'
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - run: pip install -r mp6/requirements.txt
+    - name: Autograding
+      id: autograding
+      uses: wadefagen/autograding@v2
+      with:
+        path: mp6/
+        test_suite: autograding
+        step_summary: true
+    - name: Generate workflow summary
+      if: ${{ always() }}
+      run: echo -e "$(sh ./.github/workflows/gen-status-report.sh)" >> $GITHUB_STEP_SUMMARY
+      env:
+        sr_checkout_status: ${{ steps.sr-checkout.outcome }}
+        release_checkout_status: ${{ steps.release-checkout.outcome }}
+        local_copy_status: ${{ steps.local-copy.outcome }}
+        verify_policy_status: ${{ steps.verify-policy.outcome }}
+        autograding_status: ${{ steps.autograding.outcome }}
+        points: ${{ steps.autograding.outputs.Points }}
+  extra_credit:
+    name: extra_credit
+    needs: 
+    - autograding
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout release repository
+      id: sr-checkout
+      uses: actions/checkout@v2
+    - name: Checkout release repository
+      id: release-checkout
+      uses: actions/checkout@v2
+      with:
+        repository: cs340-illinois/fa22_cs340_.release
+        ref: mp6
+        path: release
+    - name: Copy local files from release
+      id: local-copy
+      uses: illinois/local-copy@v1
+      with:
+        src_path: release/mp6
+        dst_path: mp6
+        copy: '.github/classroom : .github/classroom, Makefile : Makefile, test_docker.py : test_docker.py, test_flask.py : test_flask.py'
+    - name: Verify student submission
+      id: verify-policy
+      uses: illinois/verify-policy@v1
+      with:
+        reference_files: 'release/mp6/.github/classroom : mp6/.github/classroom, release/mp6/Makefile : mp6/Makefile, release/mp6/test_docker.py : mp6/test_docker.py, release/mp6/test_flask.py : mp6/test_flask.py'
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - run: pip install -r mp6/requirements.txt
+    - uses: wadefagen/autograding@v2
+      with:
+        path: mp6/
+        test_suite: extra_credit
+    timeout-minutes: 5
