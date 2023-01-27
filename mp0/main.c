@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-  
 
 unsigned int _log2(unsigned int x) {
   unsigned int ans = 0;
