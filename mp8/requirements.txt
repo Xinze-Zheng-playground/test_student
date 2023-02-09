@@ -1,0 +1,7 @@
+flask
+boto3
+Pillow
+pytest
+requests
+python-dotenv
+matplotlib
