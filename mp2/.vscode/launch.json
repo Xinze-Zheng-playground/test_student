@@ -1,0 +1,143 @@
+{
+   "version": "0.2.0",
+   "configurations": [
+   
+      {
+         "name": "(gdb) Run png-analyze",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/png-analyze",
+         "args": [
+            "${input:png-file-analyze}"
+         ],
+         "cwd": "${workspaceFolder}",
+         "externalConsole": false,
+         "linux": {
+            "MIMode": "gdb"
+         },
+         "osx": {
+            "MIMode": "lldb"
+         },
+         "preLaunchTask": "make",
+         "setupCommands": [
+            {
+               "description": "Enable pretty-printing for gdb",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            }
+         ]
+      },
+      {
+         "name": "(gdb) Run png-extractGif",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/png-extractGIF",
+         "args": [
+            "${input:png-file-extract}",
+            "${input:gif-file-extract}"
+         ],
+         "cwd": "${workspaceFolder}",
+         "externalConsole": false,
+         "linux": {
+            "MIMode": "gdb"
+         },
+         "osx": {
+            "MIMode": "lldb"
+         },
+         "preLaunchTask": "make",
+         "setupCommands": [
+            {
+               "description": "Enable pretty-printing for gdb",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            }
+         ]
+      },
+      {
+         "name": "(gdb) Run png-hideGif",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/png-hideGIF",
+         "args": [
+            "${input:png-file-hide}",
+            "${input:gif-file-hide}"
+         ],
+         "cwd": "${workspaceFolder}",
+         "externalConsole": false,
+         "linux": {
+            "MIMode": "gdb"
+         },
+         "osx": {
+            "MIMode": "lldb"
+         },
+         "preLaunchTask": "make",
+         "setupCommands": [
+            {
+               "description": "Enable pretty-printing for gdb",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            }
+         ]
+      },
+      {
+         "name": "(gdb) Launch make test",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/test",
+         "args": [],
+         "stopAtEntry": false,
+         "cwd": "${workspaceFolder}",
+         "environment": [],
+         "externalConsole": false,
+         "MIMode": "gdb",
+         "osx": {
+            "MIMode": "lldb"
+         },
+         "setupCommands": [
+            {
+               "description": "Enable pretty-printing for gdb",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            },
+            {
+               "description": "Set Disassembly Flavor to Intel",
+               "text": "-gdb-set disassembly-flavor intel",
+               "ignoreFailures": true
+            }
+         ],
+         "preLaunchTask": "run make test"
+      },
+   ],
+   "inputs": [
+      {
+         "id": "png-file-analyze",
+         "type": "promptString",
+         "description": "PNG File to Analyze",
+         "default": "sample/waf.png"
+      },
+      {
+         "id": "png-file-extract",
+         "type": "promptString",
+         "description": "PNG File to Extract",
+         "default": "sample/waf.png"
+      },
+      {
+         "id": "gif-file-extract",
+         "type": "promptString",
+         "description": "Gif File to Save Extract Output",
+         "default": "waf.gif"
+      },
+      {
+         "id": "png-file-hide",
+         "type": "promptString",
+         "description": "PNG File to Hide Gif",
+         "default": "340.png"
+      },
+      {
+         "id": "gif-file-hide",
+         "type": "promptString",
+         "description": "Gif File to Hide",
+         "default": "waf.gif"
+      }
+   ]
+}
